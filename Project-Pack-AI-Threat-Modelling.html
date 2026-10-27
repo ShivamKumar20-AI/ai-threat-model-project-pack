@@ -1,0 +1,178 @@
+<!doctype html><meta charset="utf-8"><title>Project pack: threat-modelling my three AI demos</title>
+<style>
+@page{size:A4;margin:11mm 13mm}
+body{font-family:Helvetica,Arial,sans-serif;font-size:9.4pt;line-height:1.32;color:#111827;margin:0}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.tag{font-size:8.4pt;color:#6b7280;text-transform:uppercase;letter-spacing:.6px}
+h1{font-size:16pt;margin:0 0 1mm;color:#1e3a8a}
+h2{font-size:10.6pt;margin:3.2mm 0 1mm;color:#1e3a8a}
+.note{background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:1.8mm 2.6mm;font-size:8.8pt;margin:0 0 2.4mm}
+table{border-collapse:collapse;width:100%;font-size:8.8pt;margin:0 0 1.4mm}
+th{background:#eef2ff;text-align:left}
+th,td{border:1px solid #d1d5db;padding:1.1mm 1.7mm;vertical-align:top}
+ul{margin:0;padding-left:4.4mm}li{margin:0 0 .5mm}
+p{margin:0 0 1.2mm}
+.g{color:#166534;font-weight:bold}.a{color:#b45309;font-weight:bold}.r{color:#b91c1c;font-weight:bold}
+.meta{font-size:8.6pt;color:#4b5563;margin-bottom:2mm}
+</style>
+
+<!-- 1. BRIEF -->
+<div class="page">
+<div class="tag">Project pack · 1 of 5 · Project brief</div>
+<h1>Threat-modelling my three public AI demos</h1>
+<div class="meta">Owner: Shivam Kumar · Delivered 20 Oct 2026 · Status: complete, with open items (see RAID log)</div>
+<div class="note"><b>How this pack was made:</b> it is a <b>retrospective</b>, reconstructed after delivery from my evidence log, report files and Git commit history. The dates are real. I did not set time estimates at the start, so there is no "planned versus actual" for effort, and I say so in the review.</div>
+
+<h2>Goal</h2>
+<p>Find, fix and openly report the security and privacy weaknesses in my three live AI demos (a GDPR request classifier, a RAG chatbot and a radiology summariser), seen from the builder's point of view, so that the documents match what the code really does.</p>
+
+<h2>In scope</h2>
+<ul><li>Data-flow diagram, trust boundaries and STRIDE review for each app</li>
+<li>Light testing of my own live apps, with made-up data only (single requests, no flooding)</li>
+<li>Rating each finding Low/Medium/High, with evidence and a fix status</li>
+<li>Fixing what I could, then retesting on the live apps</li>
+<li>Publishing the three reports (CC BY 4.0) and a plain-English article</li></ul>
+
+<h2>Out of scope</h2>
+<ul><li>A penetration test, flood or load testing, or testing anything I do not own</li>
+<li>Making the radiology model accurate (documented, not fixed) and any clinical or legal review</li>
+<li>Making the demos production-grade or paying for hosting</li></ul>
+
+<h2>Success measures (checkable)</h2>
+<table><tr><th>Measure</th><th>Result</th></tr>
+<tr><td>Three reports, each with a diagram, screenshots and a findings table</td><td class="g">Met</td></tr>
+<tr><td>Every finding rated and given a status (fixed, partly fixed, open)</td><td class="g">Met: 22 findings</td></tr>
+<tr><td>Fixes retested on the live apps, not only on my laptop</td><td class="g">Met for GDPR and radiology; RAG pin fix reverted (open)</td></tr>
+<tr><td>Reports and article public, with limits stated</td><td class="g">Met: GitHub repo and Medium article</td></tr></table>
+
+<h2>Stakeholders</h2>
+<table><tr><th>Who</th><th>Interest</th></tr>
+<tr><td>Me (owner and builder)</td><td>Accurate documents, and evidence of how I work</td></tr>
+<tr><td>Recruiters and hiring managers</td><td>Read the reports; need honest, checkable claims</td></tr>
+<tr><td>Demo visitors</td><td>Their requests must not be exposed (privacy tool, medical-style text)</td></tr>
+<tr><td>Hosting services (Streamlit, Fly.io, Hugging Face, Groq)</td><td>Terms of use, free-tier limits and quota</td></tr></table>
+
+<h2>Constraints</h2>
+<p>No paid hosting or card; part-time alongside a full-time job; my own apps and fake data only; no client information in public material; API keys never shared or committed.</p>
+</div>
+
+<!-- 2. PLAN -->
+<div class="page">
+<div class="tag">Project pack · 2 of 5 · Plan</div>
+<h1>Plan: milestones and what was delivered</h1>
+<div class="meta">All milestones were completed on 20 Oct 2026 (one long working day) and the dates below come from file and commit timestamps. No hour estimates were set beforehand.</div>
+
+<table>
+<tr><th style="width:17%">Milestone</th><th>Tasks and deliverables</th><th style="width:12%">Done</th><th style="width:14%">Depends on</th></tr>
+<tr><td><b>1. Test the live apps</b></td><td><ul><li>Walk each app as a visitor and as a misuser</li><li>RAG: two prompt-injection attempts (both resisted)</li><li>GDPR: found open history and CSV export, and a deletion request labelled as access</li><li>Radiology: public /docs, and a 20,250-character request accepted (about 40 s)</li><li>Evidence log and screenshot folders</li></ul></td><td>20 Oct</td><td>Apps live</td></tr>
+<tr><td><b>2. Write the reports</b></td><td><ul><li>Data-flow diagram per app, trust boundaries marked</li><li>STRIDE findings tables, ratings, evidence, fix status</li><li>Model risk for radiology: "normal" for 64.3% vs 9.8% for radiologists</li></ul></td><td>20 Oct</td><td>Milestone 1</td></tr>
+<tr><td><b>3. Fix</b></td><td><ul><li>GDPR: admin-only history, salted hash, no stored preview, shared rate limit, erasure rule, tests</li><li>RAG: 1,000-character cap, two rate limits, privacy notice, index checksum check</li><li>Radiology: server-side size cap, rate limits, docs off, non-root container, tests</li></ul></td><td>20 Oct</td><td>Milestone 2 (the reports set the priorities)</td></tr>
+<tr><td><b>4. Retest and deploy</b></td><td><ul><li>GDPR: forced a Streamlit rebuild, then retested live</li><li>Radiology: moved from Fly.io to a free Streamlit demo with weights in a private Hugging Face repo</li><li>RAG: pinned dependencies broke the build, so I reverted them</li></ul></td><td>20 Oct</td><td>Milestone 3; Streamlit rebuild; HF account</td></tr>
+<tr><td><b>5. Publish</b></td><td><ul><li>Public reports repo (CC BY 4.0) with README</li><li>Medium article with screenshots and captions</li><li>LinkedIn post text and CV updates</li></ul></td><td>20 Oct (repo, article)</td><td>Milestone 4 (so the reports state the final status)</td></tr>
+</table>
+
+<h2>Critical path</h2>
+<p>Test, then reports, then fixes, then live retest, then publish. The reports had to be written before the fixes (they set the priorities), and publishing had to wait for the retest so that every status in the reports was true.</p>
+
+<h2>Change during delivery</h2>
+<p>Milestone 4 grew. The Fly.io deploy was blocked by a billing request, so I rebuilt the radiology demo as a free Streamlit app (see issue I1 in the RAID log). This added work but removed several risks by design (no public API, no deploy token).</p>
+</div>
+
+<!-- 3. RAID -->
+<div class="page">
+<div class="tag">Project pack · 3 of 5 · RAID log</div>
+<h1>RAID log: risks, assumptions, issues, dependencies</h1>
+<div class="meta">Status as at 27 Oct 2026. Items that actually happened are in the Issues table.</div>
+
+<h2>Risks</h2>
+<table><tr><th style="width:5%">ID</th><th>Risk</th><th style="width:9%">Rating</th><th style="width:36%">Response</th><th style="width:11%">Outcome</th></tr>
+<tr><td>R1</td><td>Testing live apps disrupts them or uses up the Groq quota</td><td>Medium</td><td>Single requests only; no flooding; RAG flood test kept for local use</td><td>Avoided</td></tr>
+<tr><td>R2</td><td>Free-tier demos sleep or fail, so retests are unreliable</td><td>Medium</td><td>Allow for 1-2 minute wake-up; retest after each push</td><td>Happened (slow wake-up noted as a finding)</td></tr>
+<tr><td>R3</td><td>A dependency or infrastructure change breaks a live demo</td><td>Medium</td><td>Test before pushing</td><td class="r">Happened: see I2</td></tr>
+<tr><td>R4</td><td>Publishing exposes personal or client information</td><td>High</td><td>Fake data only; screenshots checked; no client names</td><td>Avoided</td></tr>
+<tr><td>R5</td><td>Overclaiming ("secure") in public write-ups</td><td>Medium</td><td>"Not a penetration test"; list open findings</td><td>Avoided</td></tr></table>
+
+<h2>Assumptions</h2>
+<table><tr><th style="width:5%">ID</th><th>Assumption</th><th style="width:30%">How I checked it</th></tr>
+<tr><td>A1</td><td>Testing my own apps with fake data needs no one's permission</td><td>Own accounts and apps only</td></tr>
+<tr><td>A2</td><td>Free tiers stay free for a demo this size</td><td>Wrong for Fly.io (see I1)</td></tr>
+<tr><td>A3</td><td>What passes on my laptop will also pass on the host</td><td>Wrong twice (see I2 and I3)</td></tr></table>
+
+<h2>Issues (things that happened)</h2>
+<table><tr><th style="width:5%">ID</th><th>Issue</th><th>Action taken</th><th style="width:11%">Status</th></tr>
+<tr><td>I1</td><td>Fly.io asked for payment details, which blocked the radiology deploy</td><td>Decided not to pay for a demo; rebuilt it on Streamlit with weights in a private Hugging Face repo; deleted the Fly app</td><td class="g">Closed</td></tr>
+<tr><td>I2</td><td>Pinned dependencies made the RAG build fail ("Error running app" for a few minutes)</td><td>Reverted the pins, corrected the README, recorded as an open finding</td><td class="a">Open (no lock file yet)</td></tr>
+<tr><td>I3</td><td>The live GDPR app still ran the old classifier after my push</td><td>Forced a Streamlit rebuild, then retested</td><td class="g">Closed</td></tr></table>
+
+<h2>Dependencies</h2>
+<table><tr><th style="width:5%">ID</th><th>Dependency</th><th style="width:30%">Needed for</th></tr>
+<tr><td>D1</td><td>Hugging Face account and private model repo (created by me)</td><td>Radiology Streamlit demo</td></tr>
+<tr><td>D2</td><td>Streamlit Cloud rebuild after each push</td><td>Live retests</td></tr>
+<tr><td>D3</td><td>Final fix statuses</td><td>Publishing the reports</td></tr></table>
+
+<h2>Still open</h2>
+<ul><li>Dependencies unpinned (needs a lock file tested on a matching environment)</li>
+<li>Radiology model accuracy documented, not fixed (needs clinician scoring)</li>
+<li>Prompt-injection tested with two attempts only; per-IP rate limits not built</li>
+<li>Action for me: confirm the temporary Hugging Face write token is deleted</li></ul>
+</div>
+
+<!-- 4. PROGRESS UPDATES -->
+<div class="page">
+<div class="tag">Project pack · 4 of 5 · Progress updates</div>
+<h1>Progress updates</h1>
+<div class="note">Written retrospectively from the evidence log and commit history. The status colours are my own judgement of how each checkpoint looked at the time, not contemporaneous records.</div>
+
+<h2>Update 1: after testing · 20 Oct · <span class="g">Green</span></h2>
+<table>
+<tr><th style="width:18%">Done</th><td>Tested all three live apps and logged evidence. Found a real exposure in each: GDPR history and CSV open to any visitor, an oversized request accepted by the radiology API, and no length cap on the chatbot.</td></tr>
+<tr><th>Next</th><td>Write the three reports and rate every finding.</td></tr>
+<tr><th>Blockers</th><td>None. The RAG app took 1-2 minutes to wake.</td></tr></table>
+
+<h2>Update 2: after fixes and retest · 20 Oct · <span class="a">Amber</span></h2>
+<table>
+<tr><th style="width:18%">Done</th><td>Fixed the GDPR, RAG and radiology findings in code, added tests, and retested GDPR on the live app (the deletion request now returns Erasure).</td></tr>
+<tr><th>Next</th><td>Re-deploy radiology somewhere free and finish the RAG changes.</td></tr>
+<tr><th>Blockers</th><td>(1) Fly.io billing wall on the radiology deploy. (2) A dependency pin I pushed broke the RAG build. Both resolved the same day (I1, I2), but the second was my own error.</td></tr>
+<tr><th>Decision</th><td>Rebuild radiology on Streamlit with a private model repo; revert the pins and record them as open.</td></tr></table>
+
+<h2>Update 3: publishing · 20 Oct · <span class="g">Green</span></h2>
+<table>
+<tr><th style="width:18%">Done</th><td>Public reports repo (CC BY 4.0), Medium article with screenshots, and a LinkedIn post. All statuses in the reports match the live apps.</td></tr>
+<tr><th>Next</th><td>Close the open items: lock file, injection test set, per-IP limits, clinician scoring.</td></tr>
+<tr><th>Blockers</th><td>None. Open risks are listed in the RAID log.</td></tr></table>
+</div>
+
+<!-- 5. REVIEW -->
+<div class="page">
+<div class="tag">Project pack · 5 of 5 · Review</div>
+<h1>Project review: what I learned</h1>
+<div class="meta">Completed 20 Oct 2026. Reviewed 27 Oct 2026.</div>
+
+<h2>Result against the brief</h2>
+<table><tr><th>Brief</th><th>Delivered</th></tr>
+<tr><td>3 apps threat-modelled</td><td>3 reports, 22 findings, each rated with a fix status</td></tr>
+<tr><td>Fix and retest live</td><td>GDPR and radiology fixed and retested; RAG hardened, except the dependency pins (reverted)</td></tr>
+<tr><td>Publish with limits stated</td><td>GitHub repo and Medium article; open findings listed</td></tr></table>
+
+<h2>What went well</h2>
+<ul><li>Writing the reports first set clear priorities for the fixes.</li>
+<li>Retesting on the live apps caught two things my laptop did not: a stale classifier and a failing build.</li>
+<li>Recording open items in public kept the claims honest.</li></ul>
+
+<h2>What did not go to plan</h2>
+<ul><li>I pushed pinned dependencies without testing them on a matching environment, which took the RAG demo down briefly.</li>
+<li>I built the radiology deploy around a host without checking it needed payment details, which forced a rebuild.</li>
+<li>I did not set effort estimates or a written definition of done at the start, so I cannot compare the plan with the actual time taken.</li></ul>
+
+<h2>Lessons and what I would change</h2>
+<table><tr><th style="width:4%">#</th><th>Next time</th></tr>
+<tr><td>1</td><td>Write time estimates and a done-checklist in the plan before starting, and compare them at the end.</td></tr>
+<tr><td>2</td><td>Test dependency and infrastructure changes on a copy that matches the host before pushing.</td></tr>
+<tr><td>3</td><td>Check a host's billing and limits before designing around it.</td></tr>
+<tr><td>4</td><td>Treat the live system as the test: retest after every push.</td></tr></table>
+
+<h2>Follow-on work</h2>
+<p>A prompt-injection test set for the chatbot, a dependency lock file, per-IP limits and clinician scoring of the radiology output. Next project: use this pack's templates from day one, with estimates set in advance.</p>
+</div>
